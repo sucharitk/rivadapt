@@ -126,7 +126,7 @@ startind = round(starttime*fs+1);
 spectplotlim = [1.25 15.75];
 
 if any(do_plots == 1)
-    % plot the overall spectral response    
+    % plot the overall spectral response
     merp = squeeze(mean(mean(mean(subj_erps(:, :, :, :, :), 2), 3), 4));
     merp = merp(:, startind(1):startind(2));
     [ft1, ff1] = AbsFFT(merp, fs);
@@ -209,25 +209,25 @@ if any(do_plots==2)
                 epoch = squeeze(subj_erps(:, 3, nc1, nc2, :));
                 if nv==1, epoch = epoch'; end
                 [ft1, ff1] = FFT_at_freq(epoch(:, startind(1):startind(2)), ...
-                    
-            %%% method 1 for SNR
-            frinds = ff1>=freq_conds(ff)+sig_freqs(1) & ...
-                ff1<=freq_conds(ff)+sig_freqs(2);
-            
-            sigval = squeeze(ft1(1, :, frinds));
-            sigff = max(sigval, [], 2);
-            
-            frinds2 = ff1<freq_conds(ff)+nse_freqs(1) | ...
-                ff1>freq_conds(ff)+nse_freqs(2);
-            nseff = squeeze(ft1(:, :, frinds2));
-            nseff = mean(nseff, 2);
-            
-            
-            if use_snr
-                ampfreq(ff, nc1, nc2, :) = sigff./nseff;
-            else
-                ampfreq(ff, nc1, nc2, :) = sigff;
-            end
+                    fs, NFFT, freq_conds(ff), fm, true);
+                
+                frinds = ff1>=freq_conds(ff)+sig_freqs(1) & ...
+                    ff1<=freq_conds(ff)+sig_freqs(2);
+                
+                sigval = squeeze(ft1(1, :, frinds));
+                sigff = max(sigval, [], 2);
+                
+                frinds2 = ff1<freq_conds(ff)+nse_freqs(1) | ...
+                    ff1>freq_conds(ff)+nse_freqs(2);
+                nseff = squeeze(ft1(:, :, frinds2));
+                nseff = mean(nseff, 2);
+                
+                
+                if use_snr
+                    ampfreq(ff, nc1, nc2, :) = sigff./nseff;
+                else
+                    ampfreq(ff, nc1, nc2, :) = sigff;
+                end
             end
         end
     end
@@ -340,7 +340,7 @@ if any(do_plots==2)
     subj_num = repmat(1:nv, nel/nv, 1); subj_num = subj_num(:);
     sprintf('2x2 rmanova between frequency type and adaptation type (only fused and rivalry) of diff scores')
     rm_anova2(mc2(:), subj_num, freq_type, adapt_type, {'freq_type', 'adapt_type'})
-        
+    
     figure('Name', 'Difference scores for the two types of frequencies')
     if use_snr
         ax = [0 4 -0.6 .4];
